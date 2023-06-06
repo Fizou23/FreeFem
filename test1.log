@@ -1,0 +1,27 @@
+-- FreeFem++ v4.6 (Fri, Apr 03, 2020  2:08:08 PM - git v4.6)
+ Load: lg_fem lg_mesh lg_mesh3 eigenvalue
+    1 : cout<<"Hello !"<<endl;
+    2 :
+    3 : //Parameters
+    4 : real theta = 4.*pi/3.;
+    5 : real a = 2.,b=1.;
+    6 : func z = x;
+ *** Warning  The identifier z hide a Global identifier
+ 
+    7 :
+    8 : //Mesh
+    9 : border Gamma1(t=0,theta){x=a*cos(t);y=b*sin(t);}
+   10 : border Gamma2(t=theta,2.*pi){x=a*cos(t);y=b*sin(t);}
+   11 : mesh Th = buildmesh(Gamma1(100)+Gamma2(50));
+   12 :
+   13 : //Fespace
+   14 : fespace Vh(Th,P2);
+   15 : Vh phi, w,f =1;
+   16 : plot(Th,wait=true);
+   17 : //Problem Laplacian
+   18 : //solve Laplace(phi, w) = int2d(Th)(dx(phi)*dx(w)+dy(phi)*dy(w))-int2d(Th)(f*w) + on(Gamma1, phi=z);ÿ sizestack
++ 1024 =1520  ( 496 )
+ 
+Hello !
+  --  mesh:  Nb of Triangles =   2592, Nb of Vertices 1372
+ try getConsole C:\Users\khfz2\OneDrive\Bureau\Pro docs\2A\PRe\FreeFEM\test1.edp
