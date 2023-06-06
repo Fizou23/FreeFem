@@ -1,23 +1,51 @@
-cout<<"Hello !"<<endl;
+load "Element_P3"
 
-//Parameters
-real theta = 4.*pi/3.;
-real a = 2.,b=1.;
+//definition of the exact solution and source
 func uex = sin(pi*x)*sin(pi*y);
-func fex = 2*pi*pi*sin(pi*x)*sin(pi*y);
+func fex = 2*(pi^2)*sin(pi*x)*sin(pi*y);
 
-//Mesh
-//border Gamma1(t=0,theta){x=a*cos(t);y=b*sin(t);}
-//border Gamma2(t=theta,2.*pi){x=a*cos(t);y=b*sin(t);}
-int n =10;
-mesh Th = square(n,n);
+//where to stock the output
+ofstream data1("C:/Users/khfz2/OneDrive/Bureau/Pro_docs/2A/PRe/FreeFEM/courbe_de_convergence_P1.txt");
+ofstream data2("C:/Users/khfz2/OneDrive/Bureau/Pro_docs/2A/PRe/FreeFEM/courbe_de_convergence_P2.txt");
+ofstream data3("C:/Users/khfz2/OneDrive/Bureau/Pro_docs/2A/PRe/FreeFEM/courbe_de_convergence_P3.txt");
+int n;
 
-//Fespace
-fespace Vh(Th,P2);
-Vh phi, w,f =fex;
+//loop to compute the solution
+for (int n=10; n<=200; n+=10) {
+    for (int degree=1;degree<=3;degree++) {
+    mesh Th = square(n,n);
+    //Fespace
+    if (degree==1) { //P1 elements
+      fespace Vh1(Th,P1);
+      Vh1 phi, w,f =fex;
+      solve Laplace(phi, w) = int2d(Th)(dx(phi)*dx(w)+dy(phi)*dy(w))-int2d(Th)(f*w) + on(1,2,3,4, phi=0);
+      Vh1 err = phi-uex;
+      real h1norm = sqrt(int2d(Th)(err^2 + dx(err)^2 + dy(err)^2)); //compute the norm of the error
+      cout<<n<<endl;
+      data1 << n <<" "<< h1norm<<endl;}
+    else if (degree==2) { //P2 elements
+      fespace Vh2(Th,P2);
+      Vh2 phi, w,f =fex;
+      solve Laplace(phi, w) = int2d(Th)(dx(phi)*dx(w)+dy(phi)*dy(w))-int2d(Th)(f*w) + on(1,2,3,4, phi=0);
+      Vh2 err = phi-uex;
+      real h1norm = sqrt(int2d(Th)(err^2 + dx(err)^2 + dy(err)^2)); //compute the norm of the error
+      cout<<n<<endl;
+      data2 << n <<" "<< h1norm<<endl;}
+    else { //P3 elements
+      fespace Vh3(Th,P3);
+      Vh3 phi, w,f =fex;
+      solve Laplace(phi, w) = int2d(Th)(dx(phi)*dx(w)+dy(phi)*dy(w))-int2d(Th)(f*w) + on(1,2,3,4, phi=0);
+      Vh3 err = phi-uex;
+      real h1norm = sqrt(int2d(Th)(err^2 + dx(err)^2 + dy(err)^2)); //compute the norm of the error
+      cout<<n<<endl;
+      data3 << n <<" "<< h1norm<<endl;}
+}}
+
+
+
 //plot(Th,wait=true);
 //Problem Laplacian
-solve Laplace(phi, w) = int2d(Th)(dx(phi)*dx(w)+dy(phi)*dy(w))-int2d(Th)(f*w) + on(1,2,3,4, phi=0);
-plot(phi,wait=true,value=true);
-Vh err = phi-uex;
-plot(err,wait=true,value=true);
+//solve Laplace(phi, w) = int2d(Th)(dx(phi)*dx(w)+dy(phi)*dy(w))-int2d(Th)(f*w) + on(1,2,3,4, phi=0);
+//plot(phi,wait=true,value=true);
+//Vh err = phi-uex;
+//plot(err,wait=true,value=true);
