@@ -1,44 +1,45 @@
 load "Element_P3"
 
-//definition of the exact solution and source
+//definition of the exact solution and source term
 func uex = sin(pi*x)*sin(pi*y);
 func fex = 2*(pi^2)*sin(pi*x)*sin(pi*y);
 
 //where to stock the output
-ofstream data1("C:/Users/khfz2/OneDrive/Bureau/Pro_docs/2A/PRe/FreeFEM/courbe_de_convergence_P1.txt");
-ofstream data2("C:/Users/khfz2/OneDrive/Bureau/Pro_docs/2A/PRe/FreeFEM/courbe_de_convergence_P2.txt");
-ofstream data3("C:/Users/khfz2/OneDrive/Bureau/Pro_docs/2A/PRe/FreeFEM/courbe_de_convergence_P3.txt");
-int n;
+ofstream data1("C:/Users/khfz2/OneDrive/Bureau/Pro_docs/2A/PRe/FreeFEM/courbe_de_convergence_P1.txt"); //P1 results
+ofstream data2("C:/Users/khfz2/OneDrive/Bureau/Pro_docs/2A/PRe/FreeFEM/courbe_de_convergence_P2.txt"); //P2 results
+ofstream data3("C:/Users/khfz2/OneDrive/Bureau/Pro_docs/2A/PRe/FreeFEM/courbe_de_convergence_P3.txt"); //P3 results
+int n; //number of subdivisions on one side of the domain
 
-//loop to compute the solution
+//loop to compute the solution for different values of n and different degrees of the finite elements
 for (int n=10; n<=200; n+=10) {
     for (int degree=1;degree<=3;degree++) {
+    //the mesh
     mesh Th = square(n,n);
     //Fespace
     if (degree==1) { //P1 elements
       fespace Vh1(Th,P1);
       Vh1 phi, w,f =fex;
-      solve Laplace(phi, w) = int2d(Th)(dx(phi)*dx(w)+dy(phi)*dy(w))-int2d(Th)(f*w) + on(1,2,3,4, phi=0);
-      Vh1 err = phi-uex;
+      solve Laplace(phi, w) = int2d(Th)(dx(phi)*dx(w)+dy(phi)*dy(w))-int2d(Th)(f*w) + on(1,2,3,4, phi=0); //solve the variational formulation
+      Vh1 err = phi-uex; //compute the error
       real h1norm = sqrt(int2d(Th)(err^2 + dx(err)^2 + dy(err)^2)); //compute the norm of the error
-      cout<<n<<endl;
-      data1 << n <<" "<< h1norm<<endl;}
+      //cout<<n<<endl;
+      data1 << n <<" "<< h1norm<<endl;} //output the result to the external file
     else if (degree==2) { //P2 elements
       fespace Vh2(Th,P2);
       Vh2 phi, w,f =fex;
-      solve Laplace(phi, w) = int2d(Th)(dx(phi)*dx(w)+dy(phi)*dy(w))-int2d(Th)(f*w) + on(1,2,3,4, phi=0);
-      Vh2 err = phi-uex;
+      solve Laplace(phi, w) = int2d(Th)(dx(phi)*dx(w)+dy(phi)*dy(w))-int2d(Th)(f*w) + on(1,2,3,4, phi=0); //solve the variational formulation
+      Vh2 err = phi-uex; //compute the error
       real h1norm = sqrt(int2d(Th)(err^2 + dx(err)^2 + dy(err)^2)); //compute the norm of the error
-      cout<<n<<endl;
-      data2 << n <<" "<< h1norm<<endl;}
+      //cout<<n<<endl;
+      data2 << n <<" "<< h1norm<<endl;} //output the result to the external file
     else { //P3 elements
       fespace Vh3(Th,P3);
       Vh3 phi, w,f =fex;
-      solve Laplace(phi, w) = int2d(Th)(dx(phi)*dx(w)+dy(phi)*dy(w))-int2d(Th)(f*w) + on(1,2,3,4, phi=0);
+      solve Laplace(phi, w) = int2d(Th)(dx(phi)*dx(w)+dy(phi)*dy(w))-int2d(Th)(f*w) + on(1,2,3,4, phi=0); //solve the variational formulation
       Vh3 err = phi-uex;
       real h1norm = sqrt(int2d(Th)(err^2 + dx(err)^2 + dy(err)^2)); //compute the norm of the error
-      cout<<n<<endl;
-      data3 << n <<" "<< h1norm<<endl;}
+      //cout<<n<<endl;
+      data3 << n <<" "<< h1norm<<endl;} //output the result to the external file
 }}
 
 
