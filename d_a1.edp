@@ -34,6 +34,15 @@ int regh = Th(0.5,0.99).region; //Omega\(B U varpi)
 
 
 //define and solve the problem
+fespace Vh(Th,[P1,P1]);
+Vh [u,xi],[v,eta];
+fespace Wh(Th,P1);
+Wh uexh=uex,fexh=fex;
+macro dN(u) (dx(u)*N.x+dy(u)*N.y) //
+macro grad(u) [dx(u),dy(u)] //
+
+real gamma = 5.;
+
 solve Pb([u,xi],[v,eta])= 
     int2d(Th,regx)( u*v ) + int2d(Th)( grad(xi)'*grad(v)  + grad(u)'*grad(eta)- grad(xi)'*grad(eta)) 
     + intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(u))*jump(dN(v)) )
