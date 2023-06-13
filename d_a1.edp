@@ -41,7 +41,7 @@ Wh uexh=uex,fexh=fex;
 macro dN(u) (dx(u)*N.x+dy(u)*N.y) //
 macro grad(u) [dx(u),dy(u)] //
 
-real gamma = 5.;
+real gamma = 5.; //stabilazation term coefficient
 
 solve Pb([u,xi],[v,eta])= 
     int2d(Th,regx)( u*v ) + int2d(Th)( grad(xi)'*grad(v)  + grad(u)'*grad(eta)- grad(xi)'*grad(eta)) 
