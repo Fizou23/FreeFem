@@ -20,7 +20,8 @@ model.fit(np.log10(h_values).reshape((-1, 1)),np.log10(h1_norms))
 print(f"slope = {model.coef_}")
 slope = model.coef_[0]
 intercept = model.intercept_
-plt.plot(h_values, 10**(intercept) * h_values**(slope), 'r', label='Regression Line')
+plt.plot(h_values, 10**(intercept) * h_values**(slope), 'r--', label='Regression Line')
+plt.plot(h_values, h_values**(0.5), 'k--', label='slope = 0.5')
 plt.legend()
 plt.grid(True)
 plt.show()

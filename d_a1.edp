@@ -32,8 +32,8 @@ int regi = Th(0.5,0.5).region; //B
 int regx = Th(0.01,0.01).region; //varpi
 int regh = Th(0.5,0.99).region; //Omega\(B U varpi)
 
-int nbiter = 12; //number of iterations in the loop
-real h=1;
+int nbiter = 11; //number of iterations in the loop
+real h=0.5;
 Th = adaptmesh(Th,uex, err=h); 
 
 for (int i=0;i<nbiter;i++) { //LOOP
