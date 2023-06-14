@@ -1,15 +1,18 @@
+//where to stock the output
+ofstream DATA("C:/Users/khfz2/OneDrive/Bureau/Pro_docs/2A/PRe/FreeFem2/FreeFem/courbe_de_convergence_da.txt"); //P1 results
+
 //definition of the exact solution and source term
 func uex = sin(pi*x)*sin(pi*y);
 func fex = 2*(pi^2)*sin(pi*x)*sin(pi*y);
 
 
 //domain defining borders
-border S1(t=0,1) {x=t;y=0;}
-border S2(t=0,1) {x=1;y=t;}
-border S3(t=0,1) {x=1+(0.875-1)*t;y=1;}
-border S4(t=0,1) {x=0.875+(0.125-0.875)*t;y=1;}
-border S5(t=0,1) {x=0.125-0.125*t;y=1;}
-border S6(t=0,1) {x=0;y=1-t;}
+border S1(t=0,1) {x=t;y=0;label=1;}
+border S2(t=0,1) {x=1;y=t;label=2;}
+border S3(t=0,1) {x=1+(0.875-1)*t;y=1;label=3;}
+border S4(t=0,1) {x=0.875+(0.125-0.875)*t;y=1;label=4;}
+border S5(t=0,1) {x=0.125-0.125*t;y=1;label=5;}
+border S6(t=0,1) {x=0;y=1-t;label=6;}
 border S7(t=0,1) {x=0.875;y=0.95+(1-0.95)*t;}
 border S8(t=0,1) {x=0.125+(0.875-0.125)*t;y=0.95;}
 border S9(t=0,1) {x=0.125;y=1+(0.95-1)*t;}
@@ -18,36 +21,46 @@ border S11(t=0,1) {x=0.125+(0.875-0.125)*t;y=0.25;}
 border S12(t=0,1) {x=0.875;y=0.25+(0.95-0.25)*t;}
 
 //mesh size
-int NN=50,
-    NNi=50;
+int NN=20,
+    NNi=20;
 
 //Building and adapting the mesh
 mesh Th = buildmesh(S1(NN)+S2(NN)+S3(NN)+S4(NNi)+S5(NN)+S6(NN)+S7(NNi)+S8(NNi)+S9(NNi)+S10(NNi)+S11(NNi)+S12(NNi));
 //plot(Th,wait=1);
-real h=0.01; //defining the new mesh size
-Th = adaptmesh(Th, h, IsMetric=1); 
-plot(Th,wait=1);
 //defining the regions
 int regi = Th(0.5,0.5).region; //B
 int regx = Th(0.01,0.01).region; //varpi
 int regh = Th(0.5,0.99).region; //Omega\(B U varpi)
 
+int nbiter = 12; //number of iterations in the loop
+real h=1;
+Th = adaptmesh(Th,uex, err=h); 
 
-//define and solve the problem
-fespace Vh(Th,[P1,P1]);
-Vh [u,xi],[v,eta];
-fespace Wh(Th,P1);
-Wh uexh=uex,fexh=fex;
-macro dN(u) (dx(u)*N.x+dy(u)*N.y) //
-macro grad(u) [dx(u),dy(u)] //
+for (int i=0;i<nbiter;i++) { //LOOP
+    //define and solve the problem
+    fespace Vh(Th,[P1,P1]);
+    Vh [u,xi],[v,eta];
+    fespace Wh(Th,P1);
+    Wh uexh=uex,fexh=fex;
+    macro dN(u) (dx(u)*N.x+dy(u)*N.y) //
+    macro grad(u) [dx(u),dy(u)] //
 
-real gamma = 5.; //stabilazation term coefficient
+    real gamma = 0.0001; //stabilazation term coefficient
 
-solve Pb([u,xi],[v,eta])= 
-    int2d(Th,regx)( u*v ) + int2d(Th)( grad(xi)'*grad(v)  + grad(u)'*grad(eta)- grad(xi)'*grad(eta)) 
-    + intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(u))*jump(dN(v)) )
-    - intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(xi))*jump(dN(eta))) - int2d(Th,regx)(uexh*v) - int2d(Th)(fexh*eta) + on(1,xi=0);
-
+    solve Pb([u,xi],[v,eta]) = 
+        int2d(Th,regx)( u*v ) + int2d(Th)( grad(xi)'*grad(v)  + grad(u)'*grad(eta)- grad(xi)'*grad(eta)) 
+        + intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(u))*jump(dN(v)) )
+        - intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(xi))*jump(dN(eta))) - int2d(Th,regx)(uexh*v) - int2d(Th)(fexh*eta) 
+        + on(1,2,3,4,5,6,xi=0);
+    plot(Th,wait=1);
+    plot(u,wait=1,fill=1,value=1,dim=3,cmm="u");
+    Wh err = u-uexh; //compute the error
+    plot(err,wait=1,fill=1,value=1,dim=3,cmm="err");
+    real h1norm = sqrt(int2d(Th,regi)(err^2 + dx(err)^2 + dy(err)^2)); //compute the norm of the error
+    DATA << h <<" "<< h1norm<<endl; //output the result to the external file
+    h/= 2; //defining the new mesh size
+    Th = adaptmesh(Th,u, err=h);
+      }
 
 //plot the solution
-plot(u,wait=1,value=1,cmm="u");
+//plot(u,wait=1,value=1,cmm="u");

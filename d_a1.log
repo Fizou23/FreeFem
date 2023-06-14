@@ -1,0 +1,29 @@
+     infiny-regularity:  min 0.157509  max 37.8636
+     anisomax  45.2939, beta max = 2.10046 min  0.0320994
+  --  mesh:  Nb of Triangles =  16974, Nb of Vertices 9000
+  -- Solve :
+          min -2.02006  max 2.24365
+  number of required edges : 0
+ Warning: too few vertices to split all internal edges
+ We lost 1829 edges. Sorry!
+  -- adaptmesh Regulary:  Nb triangles 15980 , h  min 0.000786658 , h max 0.320689
+     area =  1 , M area = 170148 , M area/( |Khat| nt) 24.5894
+     infiny-regularity:  min 0.0445561  max 188.494
+     anisomax  192.891, beta max = 3.37489 min  0.0106982
+  --  mesh:  Nb of Triangles =  15980, Nb of Vertices 9000
+  -- Solve :
+          min -3.79716  max 2.18761
+  number of required edges : 0
+ Warning: too few vertices to split all internal edges
+ We lost 5261 edges. Sorry!
+  -- adaptmesh Regulary:  Nb triangles 14244 , h  min 0.000582932 , h max 0.829514
+     area =  1 , M area = 215602 , M area/( |Khat| nt) 34.9558
+     infiny-regularity:  min 0.00420995  max 808.332
+     anisomax  3710.65, beta max = 10.4868 min  0.0121897
+  --  mesh:  Nb of Triangles =  14244, Nb of Vertices 9000
+  -- Solve :
+          min -4.44735  max 1.8364
+times: compile 0.315s, execution 9.236s,  mpirank:0
+ CodeAlloc : nb ptr  4153,  size :505360 mpirank: 0
+Ok: Normal End
+ try getConsole C:\Users\khfz2\OneDrive\Bureau\Pro_docs\2A\PRe\FreeFem2\FreeFem\d_a1.edp

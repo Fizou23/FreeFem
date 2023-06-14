@@ -32,11 +32,11 @@ plt.xlabel("P3 error")
 
 #compute the slope for each plot using a linear regression
 model = LinearRegression()
-model.fit(np.log(n_values_P1).reshape((-1, 1)),np.log(h1_norms_P1))
+model.fit(np.log10(n_values_P1).reshape((-1, 1)),np.log10(h1_norms_P1))
 print(print(f"slope for P1: {model.coef_}"))
-model.fit(np.log(n_values_P2).reshape((-1, 1)),np.log(h1_norms_P2))
+model.fit(np.log10(n_values_P2).reshape((-1, 1)),np.log10(h1_norms_P2))
 print(print(f"slope for P2: {model.coef_}"))
-model.fit(np.log(n_values_P3).reshape((-1, 1)),np.log(h1_norms_P3))
+model.fit(np.log10(n_values_P3).reshape((-1, 1)),np.log10(h1_norms_P3))
 print(print(f"slope for P3: {model.coef_}"))
 
 # Display the plot
