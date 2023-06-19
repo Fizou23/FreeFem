@@ -1,5 +1,9 @@
+load "Element_P3"
+
 //where to stock the output
-ofstream DATA("C:/Users/khfz2/OneDrive/Bureau/Pro_docs/2A/PRe/FreeFem2/FreeFem/courbe_de_convergence_da.txt"); //P1 results
+ofstream DATA1("C:/Users/khfz2/OneDrive/Bureau/Pro_docs/2A/PRe/FreeFem2/FreeFem/courbe_de_convergence_da_P1.txt"); //P1 results
+ofstream DATA2("C:/Users/khfz2/OneDrive/Bureau/Pro_docs/2A/PRe/FreeFem2/FreeFem/courbe_de_convergence_da_P2.txt"); //P2 results
+ofstream DATA3("C:/Users/khfz2/OneDrive/Bureau/Pro_docs/2A/PRe/FreeFem2/FreeFem/courbe_de_convergence_da_P3.txt"); //P3 results
 
 //definition of the exact solution and source term
 func uex = sin(pi*x)*sin(pi*y);
@@ -25,42 +29,125 @@ int NN=20,
     NNi=20;
 
 //Building and adapting the mesh
-mesh Th = buildmesh(S1(NN)+S2(NN)+S3(NN)+S4(NNi)+S5(NN)+S6(NN)+S7(NNi)+S8(NNi)+S9(NNi)+S10(NNi)+S11(NNi)+S12(NNi));
+mesh Th1 = buildmesh(S1(NN)+S2(NN)+S3(NN)+S4(NNi)+S5(NN)+S6(NN)+S7(NNi)+S8(NNi)+S9(NNi)+S10(NNi)+S11(NNi)+S12(NNi));
+mesh Th2 = buildmesh(S1(NN)+S2(NN)+S3(NN)+S4(NNi)+S5(NN)+S6(NN)+S7(NNi)+S8(NNi)+S9(NNi)+S10(NNi)+S11(NNi)+S12(NNi));
+mesh Th3 = buildmesh(S1(NN)+S2(NN)+S3(NN)+S4(NNi)+S5(NN)+S6(NN)+S7(NNi)+S8(NNi)+S9(NNi)+S10(NNi)+S11(NNi)+S12(NNi));
 //plot(Th,wait=1);
 //defining the regions
 int regi = Th(0.5,0.5).region; //B
 int regx = Th(0.01,0.01).region; //varpi
 int regh = Th(0.5,0.99).region; //Omega\(B U varpi)
 
-int nbiter = 11; //number of iterations in the loop
-real h=0.5;
-Th = adaptmesh(Th,uex, err=h); 
+int nbiter = 5; //number of iterations in the loop
+real h=0.5; //initial size of the mesh
+int degree = 1; //degree of the fe used
+Th1 = adaptmesh(Th1,uex, err=h); 
+Th2 = adaptmesh(Th2,uex, err=h); 
+Th3 = adaptmesh(Th3,uex, err=h); 
 
-for (int i=0;i<nbiter;i++) { //LOOP
-    //define and solve the problem
-    fespace Vh(Th,[P1,P1]);
-    Vh [u,xi],[v,eta];
-    fespace Wh(Th,P1);
-    Wh uexh=uex,fexh=fex;
-    macro dN(u) (dx(u)*N.x+dy(u)*N.y) //
-    macro grad(u) [dx(u),dy(u)] //
+for (int i=0;i<nbiter;i++) { /////////////Loop over h
+    for (int degree=1;degree<=3;degree++) {//loop over degree
+            if (degree==1) { //P1 elements
+            //define and solve the problem
+            fespace Vh1(Th1,[P1,P1]);
+            Vh1 [u1,xi1],[v1,eta1];
+            fespace Wh1(Th1,P1);
+            Wh1 uexh=uex,fexh=fex;
+            macro dN(u1) (dx(u1)*N.x+dy(u1)*N.y) //
+            macro grad(u1) [dx(u1),dy(u1)] //
+            macro lap(u1) (dxx(u1)+dyy(u1)) //
+            //macro lap(v) = dxx(v) + dyy(v) //
+            //int k = 2*degree;
+            real gamma = 0.001, //stabilazation term coefficient 1
+                beta = 0.001; //stabilzation term coefficient 2
 
-    real gamma = 0.0001; //stabilazation term coefficient
+            solve Pb([u1,xi1],[v1,eta1]) = 
+                int2d(Th1,regx)( u1*v1 ) + int2d(Th1)( grad(xi1)'*grad(v1)  + grad(u1)'*grad(eta1)- grad(xi1)'*grad(eta1)) 
+                + intalledges(Th1)(0.5*gamma*(nTonEdge-1)*h*jump(dN(u1))*jump(dN(v1)) ) + int2d(Th1)(beta*(h^(2*degree))*lap(u1)*lap(v1))
+                + int2d(Th1)( gamma * (h^(2*degree)) * u1 * v1 )
+                - intalledges(Th1)(0.5*gamma*(nTonEdge-1)*h*jump(dN(xi1))*jump(dN(eta1))) - int2d(Th1,regx)(uexh*v1) - int2d(Th1)(fexh*eta1) 
+                + int2d(Th1)(beta*(h^(2*degree))*fexh*lap(v1))
+                + on(1,2,3,4,5,6,xi1=0);
+            plot(Th1,wait=1);
+            plot(u1,wait=1,fill=1,value=1,dim=3,cmm="u P1");
+            Wh1 err1 = u1-uexh; //compute the error
+            plot(err1,wait=1,fill=1,value=1,dim=3,cmm="err P1");
+            real h1norm = sqrt(int2d(Th1,regi)(err1^2 + dx(err1)^2 + dy(err1)^2)); //compute the norm of the error
+            DATA1 << h <<" "<< h1norm<<endl; //output the result to the external file
+            h/= 2; //defining the new mesh size
+            Th1 = adaptmesh(Th1,u1, err=h);
+            }
+            if (degree=2) { //P2 elements
+            //define and solve the problem
+            fespace Vh(Th,[P2,P2]);
+            Vh [u,xi],[v,eta];
+            fespace Wh(Th,P2);
+            Wh uexh=uex,fexh=fex;
+            macro dN(u) (dx(u)*N.x+dy(u)*N.y) //
+            macro grad(u) [dx(u),dy(u)] //
+            macro lap(u) (dxx(u)+dyy(u)) //
+            //macro lap(v) = dxx(v) + dyy(v) //
 
-    solve Pb([u,xi],[v,eta]) = 
-        int2d(Th,regx)( u*v ) + int2d(Th)( grad(xi)'*grad(v)  + grad(u)'*grad(eta)- grad(xi)'*grad(eta)) 
-        + intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(u))*jump(dN(v)) )
-        - intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(xi))*jump(dN(eta))) - int2d(Th,regx)(uexh*v) - int2d(Th)(fexh*eta) 
-        + on(1,2,3,4,5,6,xi=0);
-    plot(Th,wait=1);
-    plot(u,wait=1,fill=1,value=1,dim=3,cmm="u");
-    Wh err = u-uexh; //compute the error
-    plot(err,wait=1,fill=1,value=1,dim=3,cmm="err");
-    real h1norm = sqrt(int2d(Th,regi)(err^2 + dx(err)^2 + dy(err)^2)); //compute the norm of the error
-    DATA << h <<" "<< h1norm<<endl; //output the result to the external file
-    h/= 2; //defining the new mesh size
-    Th = adaptmesh(Th,u, err=h);
+            real gamma = 0.001, //stabilazation term coefficient 1
+                beta = 0.001; //stabilzation term coefficient 2
+
+            solve Pb([u,xi],[v,eta]) = 
+                int2d(Th,regx)( u*v ) + int2d(Th)( grad(xi)'*grad(v)  + grad(u)'*grad(eta)- grad(xi)'*grad(eta)) 
+                + intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(u))*jump(dN(v)) ) + int2d(Th)(beta*(h^(2*degree))*lap(u)*lap(v))
+                + int2d(Th)( gamma * (h^(2*degree)) * u * v )
+                - intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(xi))*jump(dN(eta))) - int2d(Th,regx)(uexh*v) - int2d(Th)(fexh*eta) 
+                + int2d(Th)(beta*(h^(2*degree))*fexh*lap(v))
+                + on(1,2,3,4,5,6,xi=0);
+            plot(Th,wait=1);
+            plot(u,wait=1,fill=1,value=1,dim=3,cmm="u P2");
+            Wh err = u-uexh; //compute the error
+            plot(err,wait=1,fill=1,value=1,dim=3,cmm="err P2");
+            real h1norm = sqrt(int2d(Th,regi)(err^2 + dx(err)^2 + dy(err)^2)); //compute the norm of the error
+            DATA2 << h <<" "<< h1norm<<endl; //output the result to the external file
+            h/= 2; //defining the new mesh size
+            Th = adaptmesh(Th,u, err=h);
+            }
+            if (degree=3) { //P3 elements
+            //define and solve the problem
+            fespace Vh(Th,[P3,P3]);
+            Vh [u,xi],[v,eta];
+            fespace Wh(Th,P3);
+            Wh uexh=uex,fexh=fex;
+            macro dN(u) (dx(u)*N.x+dy(u)*N.y) //
+            macro grad(u) [dx(u),dy(u)] //
+            macro lap(u) (dxx(u)+dyy(u)) //
+            //macro lap(v) = dxx(v) + dyy(v) //
+
+            real gamma = 0.001, //stabilazation term coefficient 1
+                beta = 0.001; //stabilzation term coefficient 2
+
+            solve Pb([u,xi],[v,eta]) = 
+                int2d(Th,regx)( u*v ) + int2d(Th)( grad(xi)'*grad(v)  + grad(u)'*grad(eta)- grad(xi)'*grad(eta)) 
+                + intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(u))*jump(dN(v)) ) + int2d(Th)(beta*(h^(2*degree))*lap(u)*lap(v))
+                + int2d(Th)( gamma * (h^(2*degree)) * u * v )
+                - intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(xi))*jump(dN(eta))) - int2d(Th,regx)(uexh*v) - int2d(Th)(fexh*eta) 
+                + int2d(Th)(beta*(h^(2*degree))*fexh*lap(v))
+                + on(1,2,3,4,5,6,xi=0);
+            plot(Th,wait=1);
+            plot(u,wait=1,fill=1,value=1,dim=3,cmm="u P3");
+            Wh err = u-uexh; //compute the error
+            plot(err,wait=1,fill=1,value=1,dim=3,cmm="err P3");
+            real h1norm = sqrt(int2d(Th,regi)(err^2 + dx(err)^2 + dy(err)^2)); //compute the norm of the error
+            DATA3 << h <<" "<< h1norm<<endl; //output the result to the external file
+            h/= 2; //defining the new mesh size
+            Th = adaptmesh(Th,u, err=h);
+            }
+        }
       }
 
 //plot the solution
 //plot(u,wait=1,value=1,cmm="u");
+
+/*
+solve Pb([u,xi],[v,eta]) = 
+        int2d(Th,regx)( u*v ) + int2d(Th)( grad(xi)'*grad(v)  + grad(u)'*grad(eta)- grad(xi)'*grad(eta)) 
+        + intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(u))*jump(dN(v)) ) + beta*(h^(2*degree))int2d(Th)(lap(u)*lap(v)) 
+        + int2d(Th)( gamma * (h^(2*degree)) * u * v )
+        - intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(xi))*jump(dN(eta))) - int2d(Th,regx)(uexh*v) - int2d(Th)(fexh*eta) 
+        - beta*(h^(2*degree))*int2d(Th)(f*lap(v))
+        + on(1,2,3,4,5,6,xi=0); */
