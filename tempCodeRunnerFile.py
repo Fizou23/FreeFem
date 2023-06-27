@@ -1,2 +1,1 @@
-slope = model.coef_[0]
-intercept = model.intercept_
+h1_norms_P1 = data1[:, 1]
