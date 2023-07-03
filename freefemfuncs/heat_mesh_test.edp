@@ -1,0 +1,38 @@
+//domain defining borders
+
+border S1(t=0,1) {x=(1./8.)*t;y=0;}
+border S2(t=0,1) {x=1./8.+(1./4.-1./8.)*t;y=0;}
+border S3(t=0,1) {x=1./4.+(3./4.-1./4.)*t;y=0;}
+border S4(t=0,1) {x=3./4.+(7./8.-3./4.)*t;y=0;}
+border S5(t=0,1) {x=7./8. + 1./8.*t;y=0;}
+border S6(t=0,1) {x=1;y=t;}
+border S7(t=0,1) {x=1.-t/8.;y=1;}
+border S8(t=0,1) {x=7./8.+(3./4.-7./8.)*t;y=1;}
+border S9(t=0,1) {x=3./4.+(1./4.-3./4.)*t;y=1;}
+border S10(t=0,1) {x=1./4.+(1./8.-1./4.)*t;y=1;}
+border S11(t=0,1) {x=1./8.-1./8.*t;y=1;}
+border S12(t=0,1) {x=0;y=1-t;}
+border S13(t=0,1) {x=1./8.;y=t;}
+border S14(t=0,1) {x=1./4.;y=t;}
+border S15(t=0,1) {x=3./4.;y=t;}
+border S16(t=0,1) {x=7./8.;y=t;}
+
+//mesh size
+real NN = 20. ,
+     NNi= 4.;
+
+//Building and adapting the mesh
+mesh Th = buildmesh(S1(NNi)+S2(NNi)+S3(NN)+S4(NNi)+S5(NNi)+S6(NN)+S7(NNi)+S8(NNi)+S9(NN)+S10(NNi)
++S11(NNi)+S12(NN)+S13(NN)+S14(NN)+S15(NN)+S16(NN));
+
+plot(Th,wait=1);
+
+
+/*
+border A1(t=0,1) {x=t;y=0;}
+border A2(t=0,1) {x=1;y=t;}
+border A3(t=1,0) {x=t;y=1;}
+border A4(t=0,1) {x=0;y=1-t;}
+int n =5;
+mesh Th1 = buildmesh(A1(n)+A2(n)+A3(n)+A4(n));
+plot(Th1,wait=1);*/

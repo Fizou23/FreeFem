@@ -4,15 +4,15 @@ srandomdev();
 
 //settings
 real bornsup = 2.^31-1.; //MAX_RAND
-real sigma=10^(-3); //noise stddev
+real sigma=0.0001; //noise stddev
 //initial mesh size
-real NN=15.,
-     NNi=3.;
+real NN=5.,
+     NNi=1.;
 real r = 2; //rate
-int nbiter = 3; //number of iterations in the loop
+int nbiter = 4; //number of iterations in the loop
 
-real gamma = 0.001, //stabilazation term coefficient 1
-     beta = 0.001; //stabilzation term coefficient 2
+real gamma = 0.0001, //stabilazation term coefficient 1
+     beta = 0.0001; //stabilzation term coefficient 2
 
 int w = 0; //wait parameter
 int plotnoise = 1; //plot the noise parameter
@@ -42,8 +42,8 @@ border S11(t=0,1) {x=0.125+(0.875-0.125)*t;y=0.25;}
 border S12(t=0,1) {x=0.875;y=0.25+(0.95-0.25)*t;}
 
 //Building and adapting the mesh
-mesh Th = buildmesh(S1(NN)+S2(NN)+S3(NN)+S4(NN)+S5(NN)+S6(NN)+S7(NN)+S8(NN)+S9(NN)+S10(NN)+S11(NN)+S12(NN));
-//mesh Th = buildmesh(S1(NN)+S2(NN)+S3(NNi)+S4(NN)+S5(NNi)+S6(NN)+S7(NNi)+S8(NN)+S9(NNi)+S10(NN)+S11(NN)+S12(NN));
+//mesh Th = buildmesh(S1(NN)+S2(NN)+S3(NN)+S4(NN)+S5(NN)+S6(NN)+S7(NN)+S8(NN)+S9(NN)+S10(NN)+S11(NN)+S12(NN));
+mesh Th = buildmesh(S1(NN)+S2(NN)+S3(NNi)+S4(NN)+S5(NNi)+S6(NN)+S7(NNi)+S8(NN)+S9(NNi)+S10(NN)+S11(NN)+S12(NN));
 
 //defining the regions
 int regi = Th(0.5,0.5).region; //B
@@ -53,8 +53,8 @@ int regh = Th(0.5,0.99).region; //Omega\(B U varpi)
 
 for (int i=0;i<nbiter;i++) { /////////////Loop over h
     //Building and adapting the mesh
-    mesh Th = buildmesh(S1(NN)+S2(NN)+S3(NN)+S4(NN)+S5(NN)+S6(NN)+S7(NN)+S8(NN)+S9(NN)+S10(NN)+S11(NN)+S12(NN));
-    //mesh Th = buildmesh(S1(NN)+S2(NN)+S3(NNi)+S4(NN)+S5(NNi)+S6(NN)+S7(NNi)+S8(NN)+S9(NNi)+S10(NN)+S11(NN)+S12(NN));
+    //mesh Th = buildmesh(S1(NN)+S2(NN)+S3(NN)+S4(NN)+S5(NN)+S6(NN)+S7(NN)+S8(NN)+S9(NN)+S10(NN)+S11(NN)+S12(NN));
+    mesh Th = buildmesh(S1(NN)+S2(NN)+S3(NNi)+S4(NN)+S5(NNi)+S6(NN)+S7(NNi)+S8(NN)+S9(NNi)+S10(NN)+S11(NN)+S12(NN));
     
     //get the value of h
     fespace Ph(Th,P0);
@@ -80,10 +80,10 @@ for (int i=0;i<nbiter;i++) { /////////////Loop over h
 
             solve Pb1([u1,xi1],[v1,eta1]/*,solver=Crout*/) = 
                 int2d(Th,regx)( u1*v1 ) + int2d(Th)( grad(xi1)'*grad(v1)  + grad(u1)'*grad(eta1)- grad(xi1)'*grad(eta1)) 
-                + intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(u1))*jump(dN(v1)) ) + int2d(Th)(beta*(h^(2*degree))*lap(u1)*lap(v1))
+                + intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(u1))*jump(dN(v1)) ) /*+ int2d(Th)(beta*(h^(2*degree))*lap(u1)*lap(v1))*/
                 + int2d(Th)( gamma * (h^(2*degree)) * u1 * v1 )
                 - intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(xi1))*jump(dN(eta1))) - int2d(Th,regx)(g1*v1) - int2d(Th)(fexh1*eta1) 
-                + int2d(Th)(beta*(h^(2*degree))*fexh1*lap(v1))
+                /*+ int2d(Th)(beta*(h^(2*degree))*fexh1*lap(v1))*/
                 + on(1,2,3,4,5,6,xi1=0);
             
             //plot the mesh
@@ -199,3 +199,5 @@ for (int i=0;i<nbiter;i++) { /////////////Loop over h
         NN*=r;
         NNi*=r;
       }
+
+//enlever les sauts à travers les faces de sigma_h 

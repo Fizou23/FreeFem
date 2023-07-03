@@ -1,0 +1,17 @@
+load "ffrandom"
+
+ofstream d("C:/Users/khfz2/Desktop/freefemfuncs/normal_dist.txt");
+
+int maxrang = 2^31 - 1;
+real bornsup=2.^31-1.;
+int nbsamples=5000000;
+real sigma=1;
+
+for (int i=0;i<nbsamples;i++) { //loop to export sampples to python
+//real u1 = random()/bornsup;
+//real u2 = random()/bornsup;
+
+//real z1 = sqrt(-2*log(u1))*cos(2*pi*u2);
+//real z2 = sqrt(-2*log(u1))*sin(2*pi*u2);
+d<<" "<<sigma*sqrt(-2*log(random()/bornsup))*cos(2*pi*random()/bornsup)<<endl;
+}

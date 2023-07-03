@@ -1,0 +1,77 @@
+load "ffrandom"
+
+real bornsup = 2.^31-1.;
+real sigma=5;
+/*
+real u1 = random()/bornsup;
+real u2 = random()/bornsup;
+real z1 = sqrt(-2*log(u1))*cos(2*pi*u2);*/
+
+
+/*macro myFunction(arg1, arg2) {
+    real result = 0.0;
+
+    result = arg1 + arg2;
+
+    return result;
+} //
+*/
+int w=1; //wait
+
+ofstream d("C:/Users/khfz2/Desktop/freefemfuncs/normal_dist.txt");
+/*
+int maxrang = 2^31 - 1;
+real bornsup=2.^31-1.;
+int nbsamples=5000000;*/
+
+/*cout << " max range " << maxrang << endl;
+cout << random() << endl;
+cout << random() << endl;
+cout << random() << endl;
+macro myFunction(arg1,arg2) (arg1+arg2) //
+real x=2. , y=pi^2;
+cout<<myFunction(x,y)<<" and it works !"<<endl;
+//cout<<x+y<<endl;*/
+
+/*
+for (int i=0;i<nbsamples;i++) { //loop to export sampples to python
+real u1 = random()/bornsup;
+real u2 = random()/bornsup;
+
+real z1 = sqrt(-2*log(u1))*cos(2*pi*u2);
+real z2 = sqrt(-2*log(u1))*sin(2*pi*u2);
+d<<z1<<" "<<z2<<endl;
+}*/
+
+/*
+real u1 = random()/bornsup;
+real u2 = random()/bornsup;
+
+real z1 = sqrt(-2*log(u1))*cos(2*pi*u2);
+real z2 = sqrt(-2*log(u1))*sin(2*pi*u2);
+//d<<z1<<" "<<z2<<endl;
+cout<<u1<<endl;
+cout<<u2<<endl;
+cout<<z1<<endl;
+cout<<z2<<endl;*/
+
+int n=50; //mesh size
+mesh Th = square(n,n); //mesh build
+
+int nbiter = 5;
+fespace Vh(Th,P1);
+macro grad(u) [dx(u),dy(u)] //
+
+for (int k=0;k<nbiter;k++) {
+    //srandomdev();
+    func noise = sigma*sqrt(-2*log(random()/bornsup))*cos(2*pi*random()/bornsup);
+    func fex = 2*(pi^2)*sin(pi*x)*sin(pi*y) + noise;
+    func uex = sin(pi*x)*sin(pi*y);
+    Vh u,v,fexh=fex,uexh=uex;
+    solve Pb(u,v) = int2d(Th)(grad(u)'*grad(v))-int2d(Th)(v*fexh) + on(1,2,3,4,u=0);
+    plot(Th,wait=w);
+    plot(fexh,wait=w,dim=3,fill=1,value=1,cmm="f");
+    plot(u,wait=w,dim=3,fill=1,value=1,cmm="u");
+    Vh err=u-uexh;
+    plot(err,wait=w,dim=3,fill=1,value=1,cmm="err");
+}
