@@ -4,12 +4,12 @@ srandomdev();
 
 //settings
 real bornsup = 2.^31-1.; //MAX_RAND
-real sigma=0.0001; //noise stddev
+real sigma=0.; //noise stddev
 //initial mesh size
-real NN=5.,
+real NN=2.,
      NNi=1.;
 real r = 2; //rate
-int nbiter = 4; //number of iterations in the loop
+int nbiter = 6; //number of iterations in the loop
 
 real gamma = 0.0001, //stabilazation term coefficient 1
      beta = 0.0001; //stabilzation term coefficient 2
@@ -42,8 +42,8 @@ border S11(t=0,1) {x=0.125+(0.875-0.125)*t;y=0.25;}
 border S12(t=0,1) {x=0.875;y=0.25+(0.95-0.25)*t;}
 
 //Building and adapting the mesh
-//mesh Th = buildmesh(S1(NN)+S2(NN)+S3(NN)+S4(NN)+S5(NN)+S6(NN)+S7(NN)+S8(NN)+S9(NN)+S10(NN)+S11(NN)+S12(NN));
-mesh Th = buildmesh(S1(NN)+S2(NN)+S3(NNi)+S4(NN)+S5(NNi)+S6(NN)+S7(NNi)+S8(NN)+S9(NNi)+S10(NN)+S11(NN)+S12(NN));
+mesh Th = buildmesh(S1(NN)+S2(NN)+S3(NN)+S4(NN)+S5(NN)+S6(NN)+S7(NN)+S8(NN)+S9(NN)+S10(NN)+S11(NN)+S12(NN));
+//mesh Th = buildmesh(S1(NN)+S2(NN)+S3(NNi)+S4(NN)+S5(NNi)+S6(NN)+S7(NNi)+S8(NN)+S9(NNi)+S10(NN)+S11(NN)+S12(NN));
 
 //defining the regions
 int regi = Th(0.5,0.5).region; //B
@@ -53,8 +53,8 @@ int regh = Th(0.5,0.99).region; //Omega\(B U varpi)
 
 for (int i=0;i<nbiter;i++) { /////////////Loop over h
     //Building and adapting the mesh
-    //mesh Th = buildmesh(S1(NN)+S2(NN)+S3(NN)+S4(NN)+S5(NN)+S6(NN)+S7(NN)+S8(NN)+S9(NN)+S10(NN)+S11(NN)+S12(NN));
-    mesh Th = buildmesh(S1(NN)+S2(NN)+S3(NNi)+S4(NN)+S5(NNi)+S6(NN)+S7(NNi)+S8(NN)+S9(NNi)+S10(NN)+S11(NN)+S12(NN));
+    mesh Th = buildmesh(S1(NN)+S2(NN)+S3(NN)+S4(NN)+S5(NN)+S6(NN)+S7(NN)+S8(NN)+S9(NN)+S10(NN)+S11(NN)+S12(NN));
+    //mesh Th = buildmesh(S1(NN)+S2(NN)+S3(NNi)+S4(NN)+S5(NNi)+S6(NN)+S7(NNi)+S8(NN)+S9(NNi)+S10(NN)+S11(NN)+S12(NN));
     
     //get the value of h
     fespace Ph(Th,P0);
@@ -81,7 +81,7 @@ for (int i=0;i<nbiter;i++) { /////////////Loop over h
             solve Pb1([u1,xi1],[v1,eta1]/*,solver=Crout*/) = 
                 int2d(Th,regx)( u1*v1 ) + int2d(Th)( grad(xi1)'*grad(v1)  + grad(u1)'*grad(eta1)- grad(xi1)'*grad(eta1)) 
                 + intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(u1))*jump(dN(v1)) ) /*+ int2d(Th)(beta*(h^(2*degree))*lap(u1)*lap(v1))*/
-                + int2d(Th)( gamma * (h^(2*degree)) * u1 * v1 )
+                + int2d(Th)( gamma * (h^(2*degree)) * u1 * v1 ) - int2d(Th)(beta*(h^(2*degree))*lap(xi1)*lap(eta1))
                 - intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(xi1))*jump(dN(eta1))) - int2d(Th,regx)(g1*v1) - int2d(Th)(fexh1*eta1) 
                 /*+ int2d(Th)(beta*(h^(2*degree))*fexh1*lap(v1))*/
                 + on(1,2,3,4,5,6,xi1=0);
@@ -125,7 +125,7 @@ for (int i=0;i<nbiter;i++) { /////////////Loop over h
             solve Pb2([u2,xi2],[v2,eta2]) = 
                 int2d(Th,regx)( u2*v2 ) + int2d(Th)( grad(xi2)'*grad(v2)  + grad(u2)'*grad(eta2)- grad(xi2)'*grad(eta2)) 
                 + intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(u2))*jump(dN(v2)) ) + int2d(Th)(beta*(h^(2*degree))*lap(u2)*lap(v2))
-                + int2d(Th)( gamma * (h^(2*degree)) * u2 * v2 )
+                + int2d(Th)( gamma * (h^(2*degree)) * u2 * v2 ) - int2d(Th)(beta*(h^(2*degree))*lap(xi2)*lap(eta2))
                 - intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(xi2))*jump(dN(eta2))) - int2d(Th,regx)(g2*v2) - int2d(Th)(fexh2*eta2) 
                 + int2d(Th)(beta*(h^(2*degree))*fexh2*lap(v2))
                 + on(1,2,3,4,5,6,xi2=0);
@@ -169,7 +169,7 @@ for (int i=0;i<nbiter;i++) { /////////////Loop over h
             solve Pb3([u3,xi3],[v3,eta3]) = 
                 int2d(Th,regx)( u3*v3 ) + int2d(Th)( grad(xi3)'*grad(v3)  + grad(u3)'*grad(eta3)- grad(xi3)'*grad(eta3)) 
                 + intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(u3))*jump(dN(v3)) ) + int2d(Th)(beta*(h^(2*degree))*lap(u3)*lap(v3))
-                + int2d(Th)( gamma * (h^(2*degree)) * u3 * v3 )
+                + int2d(Th)( gamma * (h^(2*degree)) * u3 * v3 ) - int2d(Th)(beta*(h^(2*degree))*lap(xi3)*lap(eta3))
                 - intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(xi3))*jump(dN(eta3))) - int2d(Th,regx)(g3*v3) - int2d(Th)(fexh3*eta3) 
                 + int2d(Th)(beta*(h^(2*degree))*fexh3*lap(v3))
                 + on(1,2,3,4,5,6,xi3=0);
