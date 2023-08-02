@@ -6,16 +6,16 @@ srandomdev();
 real bornsup = 2.^31-1.; //MAX_RAND
 real sigma=0.; //noise stddev
 //initial mesh size
-real NN=50.,
-     NNi=10.;
+real NN=5.,
+     NNi=1.;
 real r = 2; //rate
-int nbiter = 1; //number of iterations in the loop
+int nbiter = 4; //number of iterations in the loop
 
-real gamma = 0.001, //stabilazation term coefficient 1
-     beta = 0.001; //stabilzation term coefficient 2
+real gamma = 0.0001, //stabilazation term coefficient 1
+     beta = 0.0001; //stabilzation term coefficient 2
 
-int w = 1 ; //wait parameter
-int plotnoise = 1; //plot the noise parameter
+int w = 0; //wait parameter
+int plotnoise = 0; //plot the noise parameter
 
 //func noise = sigma*sqrt(-2*log(random()/bornsup))*cos(2*pi*random()/bornsup);
 func fex = pi*cos(pi*y)*sin(pi*x) + pi^2*sin(pi*y)*sin(pi*x) ;
@@ -41,32 +41,64 @@ border S9(t=0,1) {x=3./4.+(1./4.-3./4.)*t;y=1;label=9;}
 border S10(t=0,1) {x=1./4.+(1./8.-1./4.)*t;y=1;label=10;}
 border S11(t=0,1) {x=1./8.-1./8.*t;y=1;label=11;}
 border S12(t=0,1) {x=0;y=1-t;label=12;}
-border S13(t=0,1) {x=1./8.;y=t;}
-border S14(t=0,1) {x=1./4.;y=t;}
-border S15(t=0,1) {x=3./4.;y=t;}
-border S16(t=0,1) {x=7./8.;y=t;}
+
+
+border S130(t=0,1) {x=1./8.;y=0.1*t;}
+border S131(t=0,1) {x=1./8.;y=0.1+(0.9-0.1)*t;}
+border S132(t=0,1) {x=1./8.;y=0.9+0.1*t;}
+border S133(t=0,1) {x=1./4.+(1./8.-1./4.)*t;y=0.1;}
+border S134(t=0,1) {x=1./4.+(1./8.-1./4.)*t;y=0.9;}
+
+border S140(t=0,1) {x=1./4.;y=0.1*t;}
+border S141(t=0,1) {x=1./4.;y=0.1+(0.9-0.1)*t;}
+border S142(t=0,1) {x=1./4.;y=0.9+0.1*t;}
+border S143(t=0,1) {x=3./4.+(1./4.-3./4.)*t;y=0.1;}
+border S144(t=0,1) {x=3./4.+(1./4.-3./4.)*t;y=0.9;}
+
+border S150(t=0,1) {x=3./4.;y=0.1*t;}
+border S151(t=0,1) {x=3./4.;y=0.1+(0.9-0.1)*t;}
+border S152(t=0,1) {x=3./4.;y=0.9+0.1*t;}
+//border S153(t=0,1) {x=1./4.+(1./8.-1./4.)*t;y=0.1;}
+border S153(t=0,1) {x=7./8.+(3./4.-7./8.)*t;y=0.1;}
+border S154(t=0,1) {x=7./8.+(3./4.-7./8.)*t;y=0.9;}
+
+border S160(t=0,1) {x=7./8.;y=0.1*t;}
+border S161(t=0,1) {x=7./8.;y=0.1+(0.9-0.1)*t;}
+border S162(t=0,1) {x=7./8.;y=0.9+0.1*t;}
 
 
 //Building and adapting the mesh
-mesh Th = buildmesh(S1(NNi)+S2(NNi)+S3(NN)+S4(NNi)+S5(NNi)+S6(NN)+S7(NNi)+S8(NNi)+S9(NN)+S10(NNi)
-+S11(NNi)+S12(NN)+S13(NN)+S14(NN)+S15(NN)+S16(NN));
+mesh Th = buildmesh(S1(NNi)+S2(NNi)+S3(NN)+S4(NNi)+S5(NNi)+S6(NN)+S7(NNi)+S8(NNi)+S9(NN)+S10(NNi)+S11(NNi)+S12(NN)+S130(NN)+S131(NN)
++S132(NN)+S133(NN)+S134(NN)+S140(NN)+S141(NN)+S142(NN)+S143(NN)+S144(NN)+S150(NN)+S151(NN)+S152(NN)+S153(NN)+S154(NN)+S160(NN)
++S161(NN)+S162(NN));
 
-//defining the regions
-int regB1 = Th(0.2,0.5).region; //B
-int regvarpi = Th(0.5,0.5).region; //varpi
-int regB2 = Th(0.8,0.5).region; //B
-
+//defining the regions :
+//verpi
+int regvarpi2 = Th(0.5,0.5).region,
+    regvarpi1 = Th(0.5,0.05).region,
+    regvarpi3 = Th(0.5,0.95).region;
+//B
+int regB1 = Th(0.2,0.05).region,
+    regB2 = Th(0.2,0.5).region,
+    regB3 = Th(0.2,0.95).region,
+    regB4 = Th(0.8,0.05).region,
+    regB5 = Th(0.8,0.5).region,
+    regB6 = Th(0.8,0.95).region;
 
 for (int i=0;i<nbiter;i++) { /////////////Loop over h
     //Building and adapting the mesh
-    mesh Th = buildmesh(S1(NNi)+S2(NNi)+S3(NN)+S4(NNi)+S5(NNi)+S6(NN)+S7(NNi)+S8(NNi)+S9(NN)+S10(NNi)
-+S11(NNi)+S12(NN)+S13(NN)+S14(NN)+S15(NN)+S16(NN));
+    mesh Th = buildmesh(S1(NNi)+S2(NNi)+S3(NN)+S4(NNi)+S5(NNi)+S6(NN)+S7(NNi)+S8(NNi)+S9(NN)+S10(NNi)+S11(NNi)+S12(NN)+S130(NNi)+S131(NN)
++S132(NNi)+S133(NNi)+S134(NNi)+S140(NNi)+S141(NN)+S142(NNi)+S143(NN)+S144(NN)+S150(NNi)+S151(NN)+S152(NNi)+S153(NNi)+S154(NNi)+S160(NNi)
++S161(NN)+S162(NNi));
     //mesh Th = buildmesh(S1(NN)+S2(NN)+S3(NNi)+S4(NN)+S5(NNi)+S6(NN)+S7(NNi)+S8(NN)+S9(NNi)+S10(NN)+S11(NN)+S12(NN));
     
     //get the value of h
     fespace Ph(Th,P0);
     Ph H = hTriangle;
     real h = H[].max;
+
+    //get the value of ndof
+    int Nddl = Th.nv;
 
     for (int degree=1;degree<=3 ;degree++) {  //loop over degree
             if (degree==1) { //P1 elements
@@ -86,10 +118,10 @@ for (int i=0;i<nbiter;i++) { /////////////Loop over h
             macro lap(u1) (dxx(u1)) //
 
             solve Pb1([u1,xi1],[v1,eta1]) = 
-                int2d(Th,regvarpi)( u1*v1 ) + int2d(Th)( gamma * (h^(2*degree)) * u1 * v1 ) 
-                + int2d(Th)(/*beta**/(h^(2*degree))*(dy(u1)-lap(u1))*(dy(v1)-lap(v1))) + intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(u1))*jump(dN(v1)) ) +
+                int2d(Th,regvarpi1,regvarpi2,regvarpi3)( u1*v1 ) + int2d(Th)( gamma * (h^(2*degree)) * u1 * v1 ) 
+                + int2d(Th)(/*beta**/(h^2)*(dy(u1)-lap(u1))*(dy(v1)-lap(v1))) + intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(u1))*jump(dN(v1)) ) +
                 int2d(Th)(dx(v1)*dx(xi1)) + int2d(Th)(dy(v1)*xi1) + int2d(Th)(dx(u1)*dx(eta1)) + int2d(Th)(dy(u1)*eta1)
-                - int2d(Th)(dx(xi1)*dx(eta1)) - int2d(Th,regvarpi)(g1*v1) - int2d(Th)((h^(2*degree))*fexh1*(dy(v1)-lap(v1))) 
+                - int2d(Th)(dx(xi1)*dx(eta1)) - int2d(Th,regvarpi1,regvarpi2,regvarpi3)(g1*v1) - int2d(Th)((h^2)*fexh1*(dy(v1)-lap(v1))) 
                 - int2d(Th)(fexh1*eta1) + on(1,2,3,4,5,6,7,8,9,10,11,12,xi1=0);
             
             //plot the mesh
@@ -106,7 +138,7 @@ for (int i=0;i<nbiter;i++) { /////////////Loop over h
             //compute the error and its norm
             Wh1 err1 = u1-uexh1; //compute the error
             plot(err1,wait=w,fill=1,value=1,dim=3,cmm="err P1"); //plot the error
-            real h1norm1 = sqrt(int2d(Th,regvarpi,regB1,regB2)(err1^2 + dx(err1)^2 + dy(err1)^2)); //compute the norm of the error
+            real h1norm1 = sqrt(int2d(Th,regvarpi2,regB2,regB5)(err1^2 + dx(err1)^2 + dy(err1)^2)); //compute the norm of the error
 
             DATA1 << h <<" "<< h1norm1 <<endl; //output the result to the external file
             }
@@ -129,10 +161,10 @@ for (int i=0;i<nbiter;i++) { /////////////Loop over h
             macro lap(u2) (dxx(u2)) //
 
             solve Pb2([u2,xi2],[v2,eta2]) = 
-                int2d(Th,regvarpi)( u2*v2 ) + int2d(Th)( gamma * (h^(2*degree)) * u2 * v2 ) 
-                + int2d(Th)(/*beta**/(h^(2*degree))*(dy(u2)-lap(u2))*(dy(v2)-lap(v2))) + intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(u2))*jump(dN(v2)) ) +
+                int2d(Th,regvarpi1,regvarpi2,regvarpi3)( u2*v2 ) + int2d(Th)( gamma * (h^(2*degree)) * u2 * v2 ) 
+                + int2d(Th)(/*beta**/(h^2)*(dy(u2)-lap(u2))*(dy(v2)-lap(v2))) + intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(u2))*jump(dN(v2)) ) +
                 int2d(Th)(dx(v2)*dx(xi2)) + int2d(Th)(dy(v2)*xi2) + int2d(Th)(dx(u2)*dx(eta2)) + int2d(Th)(dy(u2)*eta2)
-                - int2d(Th)(dx(xi2)*dx(eta2)) - int2d(Th,regvarpi)(g2*v2) - int2d(Th)((h^(2*degree))*fexh2*(dy(v2)-lap(v2))) 
+                - int2d(Th)(dx(xi2)*dx(eta2)) - int2d(Th,regvarpi1,regvarpi2,regvarpi3)(g2*v2) - int2d(Th)((h^2)*fexh2*(dy(v2)-lap(v2))) 
                 - int2d(Th)(fexh2*eta2) + on(1,2,3,4,5,6,7,8,9,10,11,12,xi2=0);
 
             //plot the mesh
@@ -149,7 +181,7 @@ for (int i=0;i<nbiter;i++) { /////////////Loop over h
             //compute the error and its norm
             Wh2 err2 = u2-uexh2; //compute the error
             plot(err2,wait=w,fill=1,value=1,dim=3,cmm="err P2"); //plot the error
-            real h1norm2 = sqrt(int2d(Th,regvarpi,regB1,regB2)(err2^2 + dx(err2)^2 + dy(err2)^2)); //compute the norm of the error
+            real h1norm2 = sqrt(int2d(Th,regvarpi2,regB2,regB5)(err2^2 + dx(err2)^2 + dy(err2)^2)); //compute the norm of the error
 
             DATA2 << h <<" "<< h1norm2<<endl; //output the result to the external file
             }
@@ -172,10 +204,10 @@ for (int i=0;i<nbiter;i++) { /////////////Loop over h
             macro lap(u3) (dxx(u3)) //
 
             solve Pb3([u3,xi3],[v3,eta3]) = 
-                int2d(Th,regvarpi)( u3*v3 ) + int2d(Th)( gamma * (h^(2*degree)) * u3 * v3 ) 
-                + int2d(Th)(/*beta**/(h^(2*degree))*(dy(u3)-lap(u3))*(dy(v3)-lap(v3))) + intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(u3))*jump(dN(v3)) ) +
+                int2d(Th,regvarpi1,regvarpi2,regvarpi3)( u3*v3 ) + int2d(Th)( gamma * (h^(2*degree)) * u3 * v3 ) 
+                + int2d(Th)(/*beta**/(h^2)*(dy(u3)-lap(u3))*(dy(v3)-lap(v3))) + intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(u3))*jump(dN(v3)) ) +
                 int2d(Th)(dx(v3)*dx(xi3)) + int2d(Th)(dy(v3)*xi3) + int2d(Th)(dx(u3)*dx(eta3)) + int2d(Th)(dy(u3)*eta3)
-                - int2d(Th)(dx(xi3)*dx(eta3)) - int2d(Th,regvarpi)(g3*v3) - int2d(Th)((h^(2*degree))*fexh3*(dy(v3)-lap(v3))) 
+                - int2d(Th)(dx(xi3)*dx(eta3)) - int2d(Th,regvarpi1,regvarpi2,regvarpi3)(g3*v3) - int2d(Th)((h^2)*fexh3*(dy(v3)-lap(v3))) 
                 - int2d(Th)(fexh3*eta3) + on(1,2,3,4,5,6,7,8,9,10,11,12,xi3=0);
 
             //plot the mesh
@@ -192,13 +224,13 @@ for (int i=0;i<nbiter;i++) { /////////////Loop over h
             //compute the error and its norm
             Wh3 err3 = u3-uexh3; //compute the error
             plot(err3,wait=w,fill=1,value=1,dim=3,cmm="err P3"); //plot the error
-            real h1norm3 = sqrt(int2d(Th,regvarpi,regB1,regB2)(err3^2 + dx(err3)^2 + dy(err3)^2)); //compute the norm of the error
+            real h1norm3 = sqrt(int2d(Th,regvarpi2,regB2,regB5)(err3^2 + dx(err3)^2 + dy(err3)^2)); //compute the norm of the error
 
             DATA3 << h <<" "<< h1norm3<<endl; //output the result to the external file
             }
         }
 
-        cout<<"i= "<<i<<", NN ="<<NN<<", NNi ="<<NNi<<endl;
+        cout<<"i= "<<i<<", NN ="<<NN<<", NNi ="<<NNi<<", Nddl ="<<Nddl<<endl;
         //update the mesh size
         NN*=r;
         NNi*=r;
@@ -207,7 +239,7 @@ for (int i=0;i<nbiter;i++) { /////////////Loop over h
 //enlever les sauts à travers les faces de sigma_h 
 /*
 solve Pb1([u1,xi1],[v1,eta1]) = 
-                int2d(Th,regvarpi)( u1*v1 ) + int2d(Th)( grad(xi1)'*grad(v1)  + grad(u1)'*grad(eta1)- grad(xi1)'*grad(eta1)) 
+                int2d(Th,regvarpi1,regvarpi2,regvarpi3)( u1*v1 ) + int2d(Th)( grad(xi1)'*grad(v1)  + grad(u1)'*grad(eta1)- grad(xi1)'*grad(eta1)) 
                 + intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(u1))*jump(dN(v1)) ) + int2d(Th)(beta*(h^(2*degree))*lap(u1)*lap(v1))
                 + int2d(Th)( gamma * (h^(2*degree)) * u1 * v1 )
                 - intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(xi1))*jump(dN(eta1))) - int2d(Th,regx)(g1*v1) - int2d(Th)(fexh1*eta1) 
@@ -215,8 +247,8 @@ solve Pb1([u1,xi1],[v1,eta1]) =
                 + on(1,2,3,4,5,6,xi1=0);
 
 solve Pb1([u1,xi1],[v1,eta1]) = 
-                int2d(Th,regvarpi)( u1*v1 ) + + int2d(Th)( gamma * (h^(2*degree)) * u1 * v1 ) 
+                int2d(Th,regvarpi1,regvarpi2,regvarpi3)( u1*v1 ) + + int2d(Th)( gamma * (h^(2*degree)) * u1 * v1 ) 
                 + int2d(Th)((dy(u1)-lap(u1))*()(dy(v1)-lap(v1))) + + intalledges(Th)(0.5*gamma*(nTonEdge-1)*h*jump(dN(u1))*jump(dN(v1)) ) +
                 int2d(Th)(dx(v1)*dx(xi1)) + int2d(Th)(dy(v1)*xi1) + int2d(Th)(dx(u1)*dx(eta1)) + int2d(Th)(dy(u1)*eta1)
-                - int2d(dx(xi1)*dx(eta1)) - int2d(Th,regvarpi)(g1*v1) - int2d(Th)((h^(2*degree))*fexh1*(dy(v1)-lap(v1))) 
+                - int2d(dx(xi1)*dx(eta1)) - int2d(Th,regvarpi1,regvarpi2,regvarpi3)(g1*v1) - int2d(Th)((h^(2*degree))*fexh1*(dy(v1)-lap(v1))) 
                 - int2d(Th)(fexh1*eta1) + on(1,2,3,4,5,6,7,8,9,10,11,12,xi1=0);*/

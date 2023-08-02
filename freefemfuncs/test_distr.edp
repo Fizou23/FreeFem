@@ -1,6 +1,6 @@
 load "ffrandom"
 
-ofstream d("C:/Users/khfz2/Desktop/freefemfuncs/normal_dist.txt");
+ofstream d("C:/Users/khfz2/Desktop/Pro_docs/2A/PRe/FreeFem2/FreeFem/freefemfuncs/normal_dist.txt");
 
 int maxrang = 2^31 - 1;
 real bornsup=2.^31-1.;

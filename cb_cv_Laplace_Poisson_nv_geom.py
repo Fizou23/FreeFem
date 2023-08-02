@@ -5,18 +5,25 @@ from sklearn.linear_model import LinearRegression
 
 #data for the P1 fe
 data1 = np.loadtxt("C:/Users/khfz2/Desktop/Pro_docs/2A/PRe/FreeFem2/FreeFem/Laplace_Poisson_nouvelle_geometrie_P1.txt")
+data11 = np.loadtxt("C:/Users/khfz2/Desktop/Pro_docs/2A/PRe/FreeFem2/FreeFem/Laplace_Poisson_nouvelle_geometrie_P1_noise.txt")
 h_values_P1 = data1[:, 0]
 h1_norms_P1 = data1[:, 1]
+h1_norms_P1_noise = data11[:, 1]
 
 #data for the P2 fe
 data2 = np.loadtxt("C:/Users/khfz2/Desktop/Pro_docs/2A/PRe/FreeFem2/FreeFem/Laplace_Poisson_nouvelle_geometrie_P2.txt")
+data22 = np.loadtxt("C:/Users/khfz2/Desktop/Pro_docs/2A/PRe/FreeFem2/FreeFem/Laplace_Poisson_nouvelle_geometrie_P2_noise.txt")
 h_values_P2 = data2[:, 0]
 h1_norms_P2 = data2[:, 1]
+h1_norms_P2_noise = data22[:, 1]
 
 #data for the P3 fe
 data3 = np.loadtxt("C:/Users/khfz2/Desktop/Pro_docs/2A/PRe/FreeFem2/FreeFem/Laplace_Poisson_nouvelle_geometrie_P3.txt")
+data33 = np.loadtxt("C:/Users/khfz2/Desktop/Pro_docs/2A/PRe/FreeFem2/FreeFem/Laplace_Poisson_nouvelle_geometrie_P3_noise.txt")
 h_values_P3 = data3[:, 0]
 h1_norms_P3 = data3[:, 1]
+h1_norms_P3_noise = data33[:, 1]
+
 
 #compute the slope for each plot using a linear regression
 model = LinearRegression()
@@ -41,22 +48,25 @@ intercept3 = model.intercept_
 
 # Create a log-log plot
 plt.subplot(1,3,1)
-plt.loglog(h_values_P1, h1_norms_P1,'b')
-plt.plot(h_values_P1, 10**(intercept1) * h_values_P1**(slope1), 'r--')
+plt.loglog(h_values_P1, h1_norms_P1,'b',marker="o",label="Sans bruit")
+plt.loglog(h_values_P1, h1_norms_P1_noise,'b--',marker="+",label="Avec bruit")
+#plt.plot(h_values_P1, 10**(intercept1) * h_values_P1**(slope1), 'r--')
 plt.plot(h_values_P1, h_values_P1, 'k--',label="Pente = 1")
 plt.xlabel("Erreur P1")
 plt.legend()
 plt.subplot(1,3,2)
-plt.loglog(h_values_P2, h1_norms_P2,'r')
-plt.plot(h_values_P2, 10**(intercept2) * h_values_P2**(slope2), 'r--')
-plt.plot(h_values_P1, h_values_P2**2, 'k--',label="Pente = 2")
+plt.loglog(h_values_P2, h1_norms_P2,'r',marker="o",label="Sans bruit")
+plt.loglog(h_values_P2, h1_norms_P2_noise,'r--',marker="+",label="Avec bruit")
+#plt.plot(h_values_P2, 10**(intercept2) * h_values_P2**(slope2), 'r--')
+plt.plot(h_values_P2, h_values_P2**2, 'k--',label="Pente = 2")
 plt.title('Norme H1 vs h')
 plt.xlabel("Erreur P2")
 plt.legend()
 plt.subplot(1,3,3)
-plt.loglog(h_values_P3, h1_norms_P3,'g')
-plt.plot(h_values_P3, 10**(intercept3) * h_values_P3**(slope3), 'r--')
-plt.plot(h_values_P1, h_values_P3**3, 'k--', label="Pente = 3")
+plt.loglog(h_values_P3, h1_norms_P3,'g',marker="o",label="Sans bruit")
+plt.loglog(h_values_P3, h1_norms_P3_noise,'g--',marker="+",label="Avec bruit")
+#plt.plot(h_values_P3, 10**(intercept3) * h_values_P3**(slope3), 'r--')
+plt.plot(h_values_P3, h_values_P3**3, 'k--', label="Pente = 3")
 plt.xlabel("Erreur P3")
 plt.legend()
 

@@ -4,7 +4,7 @@ srandomdev();
 
 //settings
 real bornsup = 2.^31-1.; //MAX_RAND
-real sigma=0.; //noise stddev
+real sigma=0.001; //noise stddev
 //initial mesh size
 real NN=5.,
      NNi=1.;
@@ -12,11 +12,11 @@ real r = 2; //rate
 int nbiter = 4; //number of iterations in the loop
 
 real gamma = 0.001, //stabilazation term coefficient 1
-     beta = 0.001, //stabilzation term coefficient 2
-     chi = 1.;
+     beta = 0.001,
+     chi = 1.; //stabilzation term coefficient 2
 
 int w = 0 ; //wait parameter
-int plotnoise = 0; //plot the noise parameter
+int plotnoise = 1; //plot the noise parameter
 
 //func noise = sigma*sqrt(-2*log(random()/bornsup))*cos(2*pi*random()/bornsup);
 func fex = 2*(pi^2)*sin(pi*x)*sin(pi*y);
@@ -24,9 +24,9 @@ func uex = sin(pi*x)*sin(pi*y);
 //func measure = uex + noise;
 
 //where to stock the output
-ofstream DATA1("C:/Users/khfz2/Desktop/Pro_docs/2A/PRe/FreeFem2/FreeFem/Laplace_Poisson_nouvelle_geometrie_P1.txt"); //P1 results
-ofstream DATA2("C:/Users/khfz2/Desktop/Pro_docs/2A/PRe/FreeFem2/FreeFem/Laplace_Poisson_nouvelle_geometrie_P2.txt"); //P2 results
-ofstream DATA3("C:/Users/khfz2/Desktop/Pro_docs/2A/PRe/FreeFem2/FreeFem/Laplace_Poisson_nouvelle_geometrie_P3.txt"); //P3 results
+ofstream DATA1("C:/Users/khfz2/Desktop/Pro_docs/2A/PRe/FreeFem2/FreeFem/Laplace_Poisson_nouvelle_geometrie_P1_noise.txt"); //P1 results
+ofstream DATA2("C:/Users/khfz2/Desktop/Pro_docs/2A/PRe/FreeFem2/FreeFem/Laplace_Poisson_nouvelle_geometrie_P2_noise.txt"); //P2 results
+ofstream DATA3("C:/Users/khfz2/Desktop/Pro_docs/2A/PRe/FreeFem2/FreeFem/Laplace_Poisson_nouvelle_geometrie_P3_noise.txt"); //P3 results
 /*
 //domain defining borders
 
@@ -187,7 +187,7 @@ for (int i=0;i<nbiter;i++) { /////////////Loop over h
                 int2d(Th,regvarpi1,regvarpi2,regvarpi3)(u2*v2) + intalledges(Th)(0.5*chi*(nTonEdge-1)*h*jump(dN(u2))*jump(dN(v2)))
                 + int2d(Th)(beta*(h^2)*lap(u2)*lap(v2)) + int2d(Th)(gamma*(h^(2*degree))*u2*v2) 
                 + int2d(Th)(grad(v2)'*grad(xi2) + grad(u2)'*grad(eta2)-grad(xi2)'*grad(eta2)) 
-                /*- intalledges(Th)(0.5*(nTonEdge-1)*h*jump(dN(xi2))*jump(dN(eta2))) 
+                /*- intalledges(Th)(0.5*(nTonEdge-1)*h*jump(dN(xi2))*jump(dN(eta2)))
                 - int2d(Th)(beta*(h^2)*lap(xi2)*lap(eta2))*/ + int2d(Th)(beta*(h^2)*fexh2*lap(v2)) - int2d(Th)(fexh2*eta2)
                 - int2d(Th,regvarpi1,regvarpi2,regvarpi3)(g2*v2) + on(1,2,3,4,5,6,7,8,9,10,11,12,xi2=0);
 
