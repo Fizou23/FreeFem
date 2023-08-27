@@ -15,7 +15,7 @@ real gamma = 0.001, //stabilazation term coefficient 1
      beta = 1.; //stabilzation term coefficient 2
 
 int w = 0; //wait parameter
-int plotnoise = 1; //plot the noise parameter
+int plotnoise = 0; //plot the noise parameter
 
 //define the functions
 func fex = pi*cos(pi*y)*sin(pi*x) + pi^2*sin(pi*y)*sin(pi*x) ;
@@ -95,9 +95,6 @@ for (int i=0;i<nbiter;i++) { /////////////Loop over h
     Ph H = hTriangle;
     real h = H[].max;
 
-    //get the value of ndof
-    int Nddl = Th.nv;
-
     for (int degree=1;degree<=3 ;degree++) {  //loop over degree
             if (degree==1) { //P1 elements
 
@@ -105,6 +102,9 @@ for (int i=0;i<nbiter;i++) { /////////////Loop over h
                 fespace Vh1(Th,[P1,P1]);
                 Vh1 [u1,xi1],[v1,eta1];
                 fespace Wh1(Th,P1);
+
+                //get the value of ndof
+                int Nddl1 = Vh1.ndof;
                 
                 srandomdev();
                 func noise = sigma*sqrt(-2*log(random()/bornsup))*cos(2*pi*random()/bornsup); //calculate noise term
@@ -138,7 +138,7 @@ for (int i=0;i<nbiter;i++) { /////////////Loop over h
                 plot(err1,wait=w,fill=1,value=1,dim=3,cmm="err P1"); //plot the error
                 real h1norm1 = sqrt(int2d(Th,regvarpi2,regB2,regB5)(err1^2 + dx(err1)^2 + dy(err1)^2)); //compute the norm of the error
 
-                DATA1 << Nddl <<" "<< h1norm1 <<endl; //output the result to the external file
+                DATA1 << Nddl1 <<" "<< h1norm1 <<endl; //output the result to the external file
                 }
 
             if (degree==2) { //P2 elements
@@ -147,6 +147,9 @@ for (int i=0;i<nbiter;i++) { /////////////Loop over h
                 fespace Vh2(Th,[P2,P2]);
                 Vh2 [u2,xi2],[v2,eta2];
                 fespace Wh2(Th,P2);
+
+                //get the value of ndof
+                int Nddl2 = Vh2.ndof;
 
                 srandomdev();
                 func noise = sigma*sqrt(-2*log(random()/bornsup))*cos(2*pi*random()/bornsup);
@@ -181,7 +184,7 @@ for (int i=0;i<nbiter;i++) { /////////////Loop over h
                 plot(err2,wait=w,fill=1,value=1,dim=3,cmm="err P2"); //plot the error
                 real h1norm2 = sqrt(int2d(Th,regvarpi2,regB2,regB5)(err2^2 + dx(err2)^2 + dy(err2)^2)); //compute the norm of the error
 
-                DATA2 << Nddl <<" "<< h1norm2<<endl; //output the result to the external file
+                DATA2 << Nddl2 <<" "<< h1norm2<<endl; //output the result to the external file
                 }
 
                 if (degree==3) { //P3 elements
@@ -190,6 +193,9 @@ for (int i=0;i<nbiter;i++) { /////////////Loop over h
                     fespace Vh3(Th,[P3,P3]);
                     Vh3 [u3,xi3],[v3,eta3];
                     fespace Wh3(Th,P3);
+
+                    //get the value of ndof
+                    int Nddl3 = Vh3.ndof;
                     
                     srandomdev();
                     func noise = sigma*sqrt(-2*log(random()/bornsup))*cos(2*pi*random()/bornsup);
@@ -224,11 +230,11 @@ for (int i=0;i<nbiter;i++) { /////////////Loop over h
                     plot(err3,wait=w,fill=1,value=1,dim=3,cmm="err P3"); //plot the error
                     real h1norm3 = sqrt(int2d(Th,regvarpi2,regB2,regB5)(err3^2 + dx(err3)^2 + dy(err3)^2)); //compute the norm of the error
 
-                    DATA3 << Nddl <<" "<< h1norm3<<endl; //output the result to the external file
+                    DATA3 << Nddl3 <<" "<< h1norm3<<endl; //output the result to the external file
                     }
             }
 
-            cout<<"i= "<<i<<", NN ="<<NN<<", NNi ="<<NNi<<", Nddl ="<<Nddl<<endl;
+            cout<<"i= "<<i<<", NN ="<<NN<<", NNi ="<<NNi<<endl;
             //update the mesh size
             NN*=r;
             NNi*=r;
